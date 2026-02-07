@@ -170,26 +170,28 @@
     <div class="tab" onclick="mostrar('produto')">📦 Produto</div>
   </div>
 
-  <div id="venda" class="card">
+      <div id="venda" class="card">
     <h2>Registrar Venda</h2>
 
     <label>Pessoa</label>
     <input id="cliente" placeholder="Nome da pessoa" />
 
-    <label>Produto</label>
-    <input id="produtoVenda" placeholder="Ex: Salgado" />
+    <label>Itens da venda</label>
+    <div id="itens"></div>
+    <button type="button" onclick="adicionarItem()">➕ Adicionar produto</button>
 
-    <div class="row">
-      <div>
-        <label>Quantidade</label>
-        <input id="quantidade" type="number" value="1" />
-      </div>
+    <div class="row" style="margin-top:14px">
       <div>
         <label>Caixa</label>
         <select id="caixaVenda">
+          <option value="">Selecione</option>
           <option>Lanchonete</option>
           <option>Lojinha</option>
         </select>
+      </div>
+      <div>
+        <label>Total (R$)</label>
+        <input id="total" disabled />
       </div>
     </div>
 
@@ -227,8 +229,16 @@
 </footer>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyY90qlGw0-noYrIoKHuF4PZKPoQB2PT9R_OlikwTDAzkTfG_BIjh37UTrWMuvhhGfk/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyYoST6YHqDLksq11dqrRkj9yk8NtA59f5BwMx9_Wbc8mayO14Exo0GO834qL-3qLrGgA/exec";
 let pagamentoSelecionado = "Dinheiro";
+let produtosCadastrados = [];
+let produtosCarregados = false;
+
+async function carregarProdutos() {
+  const res = await fetch(SCRIPT_URL + '?produtos=1');
+  produtosCadastrados = await res.json();
+  produtosCarregados = true;
+}
 
 function mostrar(id) {
   document.getElementById('venda').style.display = id === 'venda' ? 'block' : 'none';
@@ -243,21 +253,82 @@ function pagar(el) {
   pagamentoSelecionado = el.innerText;
 }
 
-function salvarProduto() {
-  enviar({
-    tipo: 'produto',
-    produto: produtoNome.value,
-    preco: preco.value,
-    caixa: caixaProduto.value
+function adicionarItem() {
+  if (!produtosCarregados) {
+    alert('Carregando produtos, aguarde um instante...');
+    return;
+  }
+
+  const div = document.createElement('div');
+  div.className = 'row';
+
+  const options = produtosCadastrados.map(p =>
+    `<option value="${p.preco}">${p.produto}</option>`
+  ).join('');
+
+  div.innerHTML = `
+    <select class="produto" onchange="atualizarPreco(this)">
+      <option value="">Produto</option>
+      ${options}
+    </select>
+    <input class="quantidade" type="number" value="1" min="1" />
+    <input class="preco" disabled />
+  `;
+
+  document.getElementById('itens').appendChild(div);
+  div.querySelector('.quantidade').addEventListener('input', calcularTotal);
+}
+
+
+function atualizarPreco(select) {
+  const row = select.parentElement;
+  const preco = select.value;
+  row.querySelector('.preco').value = preco;
+  calcularTotal();
+}
+
+function calcularTotal() {
+  let total = 0;
+  document.querySelectorAll('#itens .row').forEach(row => {
+    const q = row.querySelector('.quantidade').value;
+    const p = row.querySelector('.preco').value;
+    if (q && p) total += q * p;
   });
+  document.getElementById('total').value = total.toFixed(2);
+}
+
+function salvarProduto() {
+  enviar({ tipo: 'produto', produto: produtoNome.value, preco: preco.value, caixa: caixaProduto.value });
 }
 
 function registrarVenda() {
+  if (!cliente.value || !caixaVenda.value) {
+    alert('Preencha todos os campos');
+    return;
+  }
+
+  const itens = [];
+  let valido = true;
+
+  document.querySelectorAll('#itens .row').forEach(row => {
+    const produto = row.querySelector('.produto').selectedOptions[0].text;
+    const quantidade = row.querySelector('.quantidade').value;
+    const preco = row.querySelector('.preco').value;
+
+    if (!produto || !quantidade || !preco) valido = false;
+    itens.push({ produto, quantidade, preco });
+  });
+
+  if (!valido || itens.length === 0) {
+    alert('Complete todos os produtos');
+    return;
+  }
+
   enviar({
     tipo: 'venda',
     cliente: cliente.value,
-    produto: produtoVenda.value,
-    quantidade: quantidade.value,
+    itens: JSON.stringify(itens),
+    total: total.value,
     pagamento: pagamentoSelecionado,
     caixa: caixaVenda.value,
     data: new Date().toLocaleString()
@@ -265,11 +336,11 @@ function registrarVenda() {
 }
 
 function enviar(data) {
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify(data)
-  }).then(() => alert('Registrado com sucesso!'));
+  fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) })
+    .then(() => alert('Venda registrada com sucesso!'));
 }
+
+carregarProdutos().then(() => adicionarItem());
 </script>
 
 </body>
