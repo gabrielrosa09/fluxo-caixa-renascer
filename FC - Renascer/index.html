@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fluxo de Caixa – Renascer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --primary: #3BB7B5;
+      --primary-dark: #2aa3a1;
+      --bg: #f2fafa;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--primary);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+
+    header img {
+      height: 44px;
+    }
+
+    header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+      margin: 0;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      border-radius: 12px;
+      background: #e6f5f5;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    .tab.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.08);
+      margin-bottom: 20px;
+      animation: fade .3s ease;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+
+    label {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      margin-bottom: 14px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 15px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .payments {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .pay {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      border: 2px solid var(--primary);
+      text-align: center;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    .pay.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+    }
+
+    footer {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      padding: 20px 0 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="logo-renascer.png" alt="Renascer" />
+  <h1>Fluxo de Caixa</h1>
+</header>
+
+<main>
+  <div class="tabs">
+    <div class="tab active" onclick="mostrar('venda')">🧾 Venda</div>
+    <div class="tab" onclick="mostrar('produto')">📦 Produto</div>
+  </div>
+
+  <div id="venda" class="card">
+    <h2>Registrar Venda</h2>
+
+    <label>Pessoa</label>
+    <input id="cliente" placeholder="Nome da pessoa" />
+
+    <label>Produto</label>
+    <input id="produtoVenda" placeholder="Ex: Salgado" />
+
+    <div class="row">
+      <div>
+        <label>Quantidade</label>
+        <input id="quantidade" type="number" value="1" />
+      </div>
+      <div>
+        <label>Caixa</label>
+        <select id="caixaVenda">
+          <option>Lanchonete</option>
+          <option>Lojinha</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Pagamento</label>
+    <div class="payments">
+      <div class="pay active" onclick="pagar(this)">Dinheiro</div>
+      <div class="pay" onclick="pagar(this)">PIX</div>
+      <div class="pay" onclick="pagar(this)">Cartão</div>
+    </div>
+
+    <button onclick="registrarVenda()">Registrar Venda</button>
+  </div>
+
+  <div id="produto" class="card" style="display:none">
+    <h2>Cadastrar Produto</h2>
+
+    <label>Nome do produto</label>
+    <input id="produtoNome" />
+
+    <label>Preço</label>
+    <input id="preco" type="number" step="0.01" />
+
+    <label>Caixa</label>
+    <select id="caixaProduto">
+      <option>Lanchonete</option>
+      <option>Lojinha</option>
+    </select>
+
+    <button onclick="salvarProduto()">Salvar Produto</button>
+  </div>
+</main>
+
+<footer>
+  Sistema de Caixa – Renascer 🙏
+</footer>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyY90qlGw0-noYrIoKHuF4PZKPoQB2PT9R_OlikwTDAzkTfG_BIjh37UTrWMuvhhGfk/exec";
+let pagamentoSelecionado = "Dinheiro";
+
+function mostrar(id) {
+  document.getElementById('venda').style.display = id === 'venda' ? 'block' : 'none';
+  document.getElementById('produto').style.display = id === 'produto' ? 'block' : 'none';
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function pagar(el) {
+  document.querySelectorAll('.pay').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  pagamentoSelecionado = el.innerText;
+}
+
+function salvarProduto() {
+  enviar({
+    tipo: 'produto',
+    produto: produtoNome.value,
+    preco: preco.value,
+    caixa: caixaProduto.value
+  });
+}
+
+function registrarVenda() {
+  enviar({
+    tipo: 'venda',
+    cliente: cliente.value,
+    produto: produtoVenda.value,
+    quantidade: quantidade.value,
+    pagamento: pagamentoSelecionado,
+    caixa: caixaVenda.value,
+    data: new Date().toLocaleString()
+  });
+}
+
+function enviar(data) {
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }).then(() => alert('Registrado com sucesso!'));
+}
+</script>
+
+</body>
+</html>
