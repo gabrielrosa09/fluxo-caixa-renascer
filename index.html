@@ -2,200 +2,9 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Fluxo de Caixa – Renascer</title>
+  <title>Admin – Renascer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      --primary: #3BB7B5;
-      --primary-dark: #2aa3a1;
-      --bg: #f2fafa;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    header {
-      background: var(--primary);
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.08);
-    }
-
-    header img {
-      height: 44px;
-    }
-
-    header h1 {
-      font-size: 20px;
-      font-weight: 600;
-      color: #fff;
-      margin: 0;
-    }
-
-    main {
-      padding: 20px;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .tab {
-      flex: 1;
-      padding: 12px;
-      text-align: center;
-      border-radius: 12px;
-      background: #e6f5f5;
-      cursor: pointer;
-      font-weight: 600;
-      color: var(--primary-dark);
-    }
-
-    .tab.active {
-      background: var(--primary);
-      color: #fff;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,.08);
-      margin-bottom: 20px;
-      animation: fade .3s ease;
-    }
-
-    @keyframes fade {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    h2 {
-      margin-top: 0;
-      font-size: 18px;
-    }
-
-    label {
-      font-size: 14px;
-      color: var(--muted);
-    }
-
-    input, select {
-      width: 100%;
-      padding: 12px;
-      margin-top: 6px;
-      margin-bottom: 14px;
-      border-radius: 10px;
-      border: 1px solid #d1d5db;
-      font-size: 15px;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .payments {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .pay {
-      flex: 1;
-      padding: 12px;
-      border-radius: 12px;
-      border: 2px solid var(--primary);
-      text-align: center;
-      cursor: pointer;
-      font-weight: 600;
-      color: var(--primary-dark);
-    }
-
-    .pay.active {
-      background: var(--primary);
-      color: #fff;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      border-radius: 14px;
-      border: none;
-      font-size: 16px;
-      font-weight: 700;
-      background: var(--primary);
-      color: #fff;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: var(--primary-dark);
-    }
-
-    footer {
-      text-align: center;
-      font-size: 13px;
-      color: var(--muted);
-      padding: 20px 0 10px;
-    }
-
-    .loading {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
-    .spinner {
-      width: 18px;
-      height: 18px;
-      border: 3px solid #fff;
-      border-top: 3px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      display: inline-block;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .remover-btn {
-      background: #ef4444;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 0 14px;
-      height: 46px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.2s;
-    }
-
-    .remover-btn:hover {
-      background: #dc2626;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -206,12 +15,13 @@
 
 <main>
   <div class="tabs">
-    <div class="tab active" onclick="mostrar('venda')">🧾 Venda</div>
-    <div class="tab" onclick="mostrar('produto')">📦 Produto</div>
-    <div class="tab" onclick="mostrar('pedidos')">📋 Pedidos</div>
+    <div class="tab active" onclick="mostrar('venda', this)">🧾 Venda</div>
+    <div class="tab" onclick="mostrar('produto', this)">📦 Produto</div>
+    <div class="tab" onclick="mostrar('pedidos', this)">📋 Pedidos</div>
   </div>
 
-      <div id="venda" class="card">
+  <!-- ABA VENDA -->
+  <div id="venda" class="card">
     <h2>Registrar Venda</h2>
 
     <label>Pessoa</label>
@@ -219,9 +29,11 @@
 
     <label>Itens da venda</label>
     <div id="itens"></div>
-    <button type="button" onclick="adicionarItem()">Adicionar produto</button>
+    <button type="button" onclick="adicionarItem()" class="btn-secondary" style="margin-bottom:14px">
+      + Adicionar produto
+    </button>
 
-    <div class="row" style="margin-top:14px">
+    <div class="row">
       <div>
         <label>Caixa</label>
         <select id="caixaVenda">
@@ -245,14 +57,15 @@
     <button onclick="registrarVenda()">Registrar Venda</button>
   </div>
 
+  <!-- ABA PRODUTO -->
   <div id="produto" class="card" style="display:none">
     <h2>Cadastrar Produto</h2>
 
     <label>Nome do produto</label>
     <input id="produtoNome" />
 
-    <label>Preço</label>
-    <input id="preco" type="number" step="0.01" />
+    <label>Preço (R$)</label>
+    <input id="preco" type="number" step="0.01" min="0" />
 
     <label>Caixa</label>
     <select id="caixaProduto">
@@ -263,231 +76,15 @@
     <button onclick="salvarProduto()">Salvar Produto</button>
   </div>
 
+  <!-- ABA PEDIDOS -->
   <div id="pedidos" class="card" style="display:none">
     <h2>Pedidos Pendentes</h2>
     <div id="listaPedidos"></div>
   </div>
-
 </main>
 
-<footer>
-  Sistema de Caixa – Renascer 🙏
-</footer>
+<footer>Sistema de Caixa – Renascer 🙏</footer>
 
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyfA8eNScybrenSmeLu9Fr6WuRtTXVJ6C5bTOkXlWT7dtsNVmsgeVTIk7LOpDJn596v2A/exec";
-let pagamentoSelecionado = "Dinheiro";
-let produtosCadastrados = [];
-let produtosCarregados = false;
-
-async function carregarProdutos() {
-  const res = await fetch(SCRIPT_URL + '?produtos=1');
-  produtosCadastrados = await res.json();
-  produtosCarregados = true;
-}
-
-function mostrar(id) {
-  document.getElementById('venda').style.display = id === 'venda' ? 'block' : 'none';
-  document.getElementById('produto').style.display = id === 'produto' ? 'block' : 'none';
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-}
-
-function pagar(el) {
-  document.querySelectorAll('.pay').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  pagamentoSelecionado = el.innerText;
-}
-
-function adicionarItem() {
-  if (!produtosCarregados) {
-    alert('Carregando produtos, aguarde um instante...');
-    return;
-  }
-
-  const div = document.createElement('div');
-  div.className = 'row';
-
-  const options = produtosCadastrados.map(p =>
-    `<option value="${p.preco}">${p.produto}</option>`
-  ).join('');
-
-  div.innerHTML = `
-  <select class="produto" onchange="atualizarPreco(this)">
-    <option value="">Produto</option>
-    ${options}
-  </select>
-  <input class="quantidade" type="number" value="1" min="1" />
-  <input class="preco" disabled />
-  <div class="remover-btn" onclick="removerItem(this)">X</div>
-`;
-
-  document.getElementById('itens').appendChild(div);
-  div.querySelector('.quantidade').addEventListener('input', calcularTotal);
-}
-
-function removerItem(el) {
-  el.parentElement.remove();
-  calcularTotal();
-}
-
-function atualizarPreco(select) {
-  const row = select.parentElement;
-  const preco = select.value;
-  row.querySelector('.preco').value = preco;
-  calcularTotal();
-}
-
-function calcularTotal() {
-  let total = 0;
-  document.querySelectorAll('#itens .row').forEach(row => {
-    const q = row.querySelector('.quantidade').value;
-    const p = row.querySelector('.preco').value;
-    if (q && p) total += q * p;
-  });
-  document.getElementById('total').value = total.toFixed(2);
-}
-
-function salvarProduto() {
-  enviar({ tipo: 'produto', produto: produtoNome.value, preco: preco.value, caixa: caixaProduto.value });
-}
-
-function registrarVenda() {
-  const btn = event.target;
-
-  if (!cliente.value || !caixaVenda.value) {
-    alert('Preencha todos os campos');
-    return;
-  }
-
-  const itens = [];
-  let valido = true;
-
-  document.querySelectorAll('#itens .row').forEach(row => {
-    const produto = row.querySelector('.produto').selectedOptions[0].text;
-    const quantidade = row.querySelector('.quantidade').value;
-    const preco = row.querySelector('.preco').value;
-
-    if (!produto || !quantidade || !preco) valido = false;
-    itens.push({ produto, quantidade, preco });
-  });
-
-  if (!valido || itens.length === 0) {
-    alert('Complete todos os produtos');
-    return;
-  }
-
-  // ATIVA LOADING
-  btn.classList.add("loading");
-  btn.innerHTML = `<span class="spinner"></span> Registrando...`;
-
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify({
-      tipo: 'venda',
-      cliente: cliente.value,
-      itens: JSON.stringify(itens),
-      total: total.value,
-      pagamento: pagamentoSelecionado,
-      caixa: caixaVenda.value,
-      data: new Date().toLocaleString()
-    })
-  })
-  .then(() => {
-    alert('Venda registrada com sucesso!');
-
-    // LIMPAR FORMULÁRIO
-    cliente.value = "";
-    caixaVenda.value = "";
-    document.getElementById('itens').innerHTML = "";
-    total.value = "";
-    adicionarItem();
-
-  })
-  .finally(() => {
-    btn.classList.remove("loading");
-    btn.innerHTML = "Registrar Venda";
-  });
-}
-
-function enviar(data) {
-  fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) })
-    .then(() => alert('Venda registrada com sucesso!'));
-}
-
-carregarProdutos().then(() => adicionarItem());
-
-
-async function carregarPedidos() {
-  const res = await fetch(SCRIPT_URL + '?pedidos=1');
-  const pedidos = await res.json();
-
-  const container = document.getElementById('listaPedidos');
-  container.innerHTML = "";
-
-  if (pedidos.length === 0) {
-    container.innerHTML = "<p>Nenhum pedido pendente 🙏</p>";
-    return;
-  }
-
-  pedidos.forEach(p => {
-    const div = document.createElement('div');
-    div.className = "card";
-    div.style.marginBottom = "15px";
-
-    div.innerHTML = `
-      <strong>${p.cliente}</strong><br>
-      ${JSON.parse(p.itens).map(i => 
-        `${i.quantidade}x ${i.produto}`
-      ).join("<br>")}
-      <br><br>
-      Total: R$ ${p.total}
-      <br><br>
-      <button onclick="finalizarPedido(${p.linha}, this)">✅ OK</button>
-    `;
-
-    container.appendChild(div);
-  });
-}
-
-function finalizarPedido(linha, btn) {
-
-  btn.classList.add("loading");
-  btn.innerHTML = `<span class="spinner"></span> Finalizando...`;
-
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify({
-      tipo: 'finalizar',
-      linha: linha
-    })
-  })
-  .then(() => {
-    carregarPedidos();
-  })
-  .finally(() => {
-    btn.classList.remove("loading");
-    btn.innerHTML = "✅ OK";
-  });
-}
-
-
-
-function mostrar(id) {
-  document.getElementById('venda').style.display = id === 'venda' ? 'block' : 'none';
-  document.getElementById('produto').style.display = id === 'produto' ? 'block' : 'none';
-  document.getElementById('pedidos').style.display = id === 'pedidos' ? 'block' : 'none';
-
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-
-  if (id === 'pedidos') {
-    carregarPedidos();
-  }
-}
-
-
-</script>
-
+<script src="admin.js"></script>
 </body>
 </html>

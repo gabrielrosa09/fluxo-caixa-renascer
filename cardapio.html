@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Renascer – Cardápio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <img src="logo-renascer.png" alt="Renascer" />
+  <div>
+    <h1>Lanchonete Renascer</h1>
+    <p>Faça seu pedido aqui ✨</p>
+  </div>
+</header>
+
+<!-- =============== TELA 1: CARDÁPIO =============== -->
+<div id="tela-menu">
+  <main>
+    <div id="lista-produtos" class="produto-grid"></div>
+  </main>
+
+  <div id="cart-bar" class="cart-bar hidden" onclick="irParaCheckout()">
+    <div>
+      <div class="cart-bar-count" id="cart-count">0 itens</div>
+      <div class="cart-bar-total" id="cart-total">R$ 0,00</div>
+    </div>
+    <div class="cart-bar-btn">Ver carrinho →</div>
+  </div>
+</div>
+
+<!-- =============== TELA 2: CHECKOUT =============== -->
+<div id="tela-checkout" class="hidden">
+  <main>
+    <div class="card">
+      <h2>🛒 Seu carrinho</h2>
+      <div id="resumo-carrinho"></div>
+      <div class="order-total" id="checkout-total" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card">
+      <label>Seu nome</label>
+      <input id="nome-cliente" placeholder="Como você se chama?" autocomplete="given-name" />
+
+      <label>Forma de pagamento</label>
+      <div class="payments">
+        <div class="pay" onclick="selecionarPagamento(this)">💵 Dinheiro</div>
+        <div class="pay active" onclick="selecionarPagamento(this)">📱 PIX</div>
+        <div class="pay" onclick="selecionarPagamento(this)">💳 Cartão</div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:4px">
+        <button class="btn-secondary" style="flex:1" onclick="voltarMenu()">← Voltar</button>
+        <button style="flex:2" onclick="confirmarPedido()">Confirmar ✓</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- =============== TELA 3: PIX =============== -->
+<div id="tela-pix" class="hidden">
+  <main>
+    <div class="card" style="text-align:center">
+      <div style="font-size:52px; margin-bottom:8px">📱</div>
+      <h2>Pague via PIX</h2>
+      <p style="color:var(--muted); margin-bottom:4px">
+        Faça o pagamento e depois clique em <strong>Já paguei</strong>
+      </p>
+
+      <div class="pix-key-box">
+        <div class="pix-label">Chave PIX</div>
+        <div class="pix-key" id="pix-display-key"></div>
+        <div class="pix-label" style="margin-top:12px">Valor a pagar</div>
+        <div class="pix-amount" id="pix-display-amount"></div>
+        <div class="pix-label" id="pix-display-name"></div>
+      </div>
+
+      <button onclick="copiarPix()" class="btn-secondary" style="margin-bottom:12px">
+        📋 Copiar chave PIX
+      </button>
+      <button onclick="confirmarPagamento()" class="btn-success">
+        ✅ Já paguei!
+      </button>
+    </div>
+  </main>
+</div>
+
+<!-- =============== TELA 4: AGUARDANDO / PRONTO =============== -->
+<div id="tela-aguardando" class="hidden">
+  <main>
+    <div class="card" id="status-card">
+
+      <!-- Estado: em preparo -->
+      <div id="estado-preparo" class="status-center">
+        <span class="status-icon">👨‍🍳</span>
+        <div class="status-title" id="status-title">Pedido recebido!</div>
+        <div class="status-subtitle">Sua comida está sendo preparada com carinho...</div>
+        <div class="order-num" id="status-num"></div>
+        <div id="status-itens" class="order-items" style="margin-top:16px; border-top:1px solid #f0f0f0; padding-top:16px"></div>
+        <div class="order-total" id="status-total" style="margin-top:12px"></div>
+      </div>
+
+      <!-- Estado: pronto -->
+      <div id="estado-pronto" class="hidden">
+        <div class="pronto-banner">
+          <span class="big-emoji">🎉</span>
+          <h2>Seu pedido está pronto!</h2>
+          <p>Retire no balcão agora 😊</p>
+        </div>
+        <button onclick="novoPedido()" style="margin-top:16px">
+          + Fazer novo pedido
+        </button>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="cardapio.js"></script>
+</body>
+</html>

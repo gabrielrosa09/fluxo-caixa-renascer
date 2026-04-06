@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cozinha – Renascer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ===== TELA PIN ===== -->
+<div id="tela-pin" class="pin-screen">
+  <div class="pin-card">
+    <img src="logo-renascer.png" alt="Renascer" />
+    <h2>Acesso da Cozinha</h2>
+    <p class="hint">Digite o código de acesso</p>
+    <input
+      type="password"
+      id="pin-input"
+      placeholder="Código de acesso"
+      onkeydown="if(event.key==='Enter') verificarPin()"
+      autocomplete="off"
+    />
+    <button onclick="verificarPin()">Entrar →</button>
+    <p id="pin-erro" class="pin-erro hidden">Código incorreto, tente novamente.</p>
+  </div>
+</div>
+
+<!-- ===== TELA COZINHA ===== -->
+<div id="tela-cozinha" class="hidden">
+  <header>
+    <img src="logo-renascer.png" alt="Renascer" />
+    <h1>Cozinha</h1>
+    <div class="cozinha-header-right">
+      <div class="dot-live"></div>
+      <span>Ao vivo</span>
+      <span id="badge-total" class="badge-count hidden">0</span>
+    </div>
+  </header>
+
+  <main class="wide">
+    <div id="pedidos-container" class="pedidos-grid"></div>
+  </main>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="cozinha.js"></script>
+</body>
+</html>
