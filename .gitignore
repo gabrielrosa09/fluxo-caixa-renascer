@@ -1,1 +1,3 @@
-firebase-config.js
+# Nenhum arquivo sensível neste projeto estático.
+# A API key do Firebase para web é pública por design —
+# a segurança é feita pelas regras do Realtime Database.
