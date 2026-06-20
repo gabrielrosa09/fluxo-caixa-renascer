@@ -9,16 +9,11 @@
 <body>
 
 <header>
-  <img src="logo-renascer.png" alt="Renascer" />
+  <img src="logo-renascer.svg" alt="Renascer" />
   <h1>Fluxo de Caixa</h1>
 </header>
 
 <main>
-  <div class="tabs">
-    <div class="tab active" onclick="mostrar('venda', this)">🧾 Venda</div>
-    <div class="tab" onclick="mostrar('produto', this)">📦 Produto</div>
-    <div class="tab" onclick="mostrar('pedidos', this)">📋 Pedidos</div>
-  </div>
 
   <!-- ABA VENDA -->
   <div id="venda" class="card">
@@ -73,7 +68,7 @@
       <option>Lojinha</option>
     </select>
 
-    <button onclick="salvarProduto()">Salvar Produto</button>
+    <button id="btnSalvarProduto" onclick="salvarProduto()">Salvar Produto</button>
   </div>
 
   <!-- ABA PEDIDOS -->
@@ -81,9 +76,52 @@
     <h2>Pedidos Pendentes</h2>
     <div id="listaPedidos"></div>
   </div>
+
+  <!-- ABA DASHBOARD -->
+  <div id="dashboard" style="display:none">
+    <div class="dash-stats">
+      <div class="stat-card stat-green">
+        <div class="stat-label">Total Arrecadado</div>
+        <div class="stat-value" id="dashTotal">—</div>
+      </div>
+      <div class="stat-card stat-red">
+        <div class="stat-label">A Receber</div>
+        <div class="stat-value" id="dashPendente">—</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Produtos Mais Vendidos</h2>
+      <div id="dashProdutos"><p style="color:var(--muted)">Carregando...</p></div>
+    </div>
+
+    <div class="card">
+      <h2>Pendentes de Pagamento</h2>
+      <div id="dashPendentes"><p style="color:var(--muted)">Carregando...</p></div>
+    </div>
+  </div>
 </main>
 
-<footer>Sistema de Caixa – Renascer 🙏</footer>
+<footer>Sistema de Caixa – Renascer</footer>
+
+<nav class="bottom-nav">
+  <div class="tab active" onclick="mostrar('venda', this)">
+    <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M14 8H8"/><path d="M16 12H8"/><path d="M13 16H8"/></svg></span>
+    <span>Venda</span>
+  </div>
+  <div class="tab" onclick="mostrar('produto', this)">
+    <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span>
+    <span>Produto</span>
+  </div>
+  <div class="tab" onclick="mostrar('pedidos', this)">
+    <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg></span>
+    <span>Pedidos</span>
+  </div>
+  <div class="tab" onclick="mostrar('dashboard', this)">
+    <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
+    <span>Dashboard</span>
+  </div>
+</nav>
 
 <script src="admin.js"></script>
 </body>

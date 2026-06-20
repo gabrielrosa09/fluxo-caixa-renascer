@@ -1,6 +1,6 @@
 // admin.js – Painel administrativo (Fluxo de Caixa)
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyfA8eNScybrenSmeLu9Fr6WuRtTXVJ6C5bTOkXlWT7dtsNVmsgeVTIk7LOpDJn596v2A/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzuldXmAt82bzxv0eaN_VZETg1Py4_Wn00FJEeRW-Cm2F8VYCKLeLMZzLQ-4u39-oW07Q/exec";
 
 let pagamentoSelecionado = "Dinheiro";
 let produtosCadastrados = [];
@@ -15,12 +15,13 @@ carregarProdutos().then(() => adicionarItem());
 
 // ====== TABS ======
 function mostrar(id, el) {
-  ['venda', 'produto', 'pedidos'].forEach(t => {
+  ['venda', 'produto', 'pedidos', 'dashboard'].forEach(t => {
     document.getElementById(t).style.display = t === id ? 'block' : 'none';
   });
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   if (id === 'pedidos') carregarPedidos();
+  if (id === 'dashboard') carregarDashboard();
 }
 
 // ====== PAGAMENTO ======
@@ -82,6 +83,10 @@ function salvarProduto() {
 
   if (!nome || !preco) { alert('Preencha o nome e o preço'); return; }
 
+  const btn = document.getElementById('btnSalvarProduto');
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+
   fetch(SCRIPT_URL, {
     method: 'POST',
     body: JSON.stringify({ tipo: 'produto', produto: nome, preco, caixa })
@@ -90,6 +95,9 @@ function salvarProduto() {
     document.getElementById('produtoNome').value = '';
     document.getElementById('preco').value = '';
     carregarProdutos();
+  }).finally(() => {
+    btn.disabled = false;
+    btn.textContent = 'Salvar Produto';
   });
 }
 
@@ -156,7 +164,7 @@ async function carregarPedidos() {
   container.innerHTML = '';
 
   if (pedidos.length === 0) {
-    container.innerHTML = '<p style="color:var(--muted)">Nenhum pedido pendente 🙏</p>';
+    container.innerHTML = '<p style="color:var(--muted)">Nenhum pedido pendente.</p>';
     return;
   }
 
@@ -168,10 +176,71 @@ async function carregarPedidos() {
       <strong>${p.cliente}</strong><br>
       ${JSON.parse(p.itens).map(i => `${i.quantidade}x ${i.produto}`).join('<br>')}
       <br><br>Total: R$ ${p.total}<br><br>
-      <button onclick="finalizarPedido(${p.linha}, this)">✅ Finalizar</button>
+      <button onclick="finalizarPedido(${p.linha}, this)">Finalizar</button>
     `;
     container.appendChild(div);
   });
+}
+
+// ====== DASHBOARD ======
+async function carregarDashboard() {
+  document.getElementById('dashTotal').textContent = '—';
+  document.getElementById('dashPendente').textContent = '—';
+  document.getElementById('dashProdutos').innerHTML = '<p style="color:var(--muted)">Carregando...</p>';
+  document.getElementById('dashPendentes').innerHTML = '<p style="color:var(--muted)">Carregando...</p>';
+
+  const res = await fetch(SCRIPT_URL + '?vendas=1');
+  const vendas = await res.json();
+
+  let totalGeral = 0;
+  let totalPendente = 0;
+  const contagem = {};
+  const pendentes = [];
+
+  vendas.forEach(v => {
+    const valor  = parseFloat(String(v.total || 0).replace(',', '.')) || 0;
+    const status = String(v.status || '').trim().toUpperCase();
+
+    totalGeral += valor;
+    if (status === 'PENDENTE') {
+      totalPendente += valor;
+      pendentes.push({ cliente: v.cliente, valor });
+    }
+
+    let itens = [];
+    try { itens = JSON.parse(v.itens || '[]'); } catch (_) {}
+    itens.forEach(item => {
+      const nome = item.produto || '';
+      const qty  = parseInt(item.quantidade || 1, 10);
+      contagem[nome] = (contagem[nome] || 0) + qty;
+    });
+  });
+
+  document.getElementById('dashTotal').textContent = totalGeral.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  document.getElementById('dashPendente').textContent = totalPendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  const ranking = Object.entries(contagem).sort((a, b) => b[1] - a[1]);
+  const maxQty  = ranking[0]?.[1] || 1;
+  document.getElementById('dashProdutos').innerHTML = ranking.length === 0
+    ? '<p style="color:var(--muted)">Nenhum dado</p>'
+    : ranking.map(([nome, qty]) => `
+        <div class="dash-produto-row">
+          <div class="dash-produto-nome">${nome}</div>
+          <div class="dash-barra-wrap">
+            <div class="dash-barra" style="width:${Math.round((qty / maxQty) * 100)}%"></div>
+          </div>
+          <div class="dash-produto-qty">${qty}x</div>
+        </div>
+      `).join('');
+
+  document.getElementById('dashPendentes').innerHTML = pendentes.length === 0
+    ? '<p style="color:var(--muted)">Nenhum pendente.</p>'
+    : pendentes.map(p => `
+        <div class="dash-pendente-row">
+          <span class="dash-pendente-nome">${p.cliente}</span>
+          <span class="dash-pendente-valor">${p.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+        </div>
+      `).join('');
 }
 
 function finalizarPedido(linha, btn) {
@@ -185,6 +254,6 @@ function finalizarPedido(linha, btn) {
   .then(() => carregarPedidos())
   .finally(() => {
     btn.disabled = false;
-    btn.innerHTML = '✅ Finalizar';
+    btn.innerHTML = 'Finalizar';
   });
 }

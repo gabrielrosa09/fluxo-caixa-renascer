@@ -1,47 +1,29 @@
 // cardapio.js – Página do cliente
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyfA8eNScybrenSmeLu9Fr6WuRtTXVJ6C5bTOkXlWT7dtsNVmsgeVTIk7LOpDJn596v2A/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzuldXmAt82bzxv0eaN_VZETg1Py4_Wn00FJEeRW-Cm2F8VYCKLeLMZzLQ-4u39-oW07Q/exec";
 
-// Guarda o listener do Firebase para poder desligar depois
-let statusListener = null;
-let pedidoAtual    = null;
-let pagamentoSelecionado = "📱 PIX";
-let carrinho = {}; // { "nome": { nome, preco, qty } }
+let pollingTimer         = null;
+let sawPending           = false;
+let pedidoAtual          = null;
+let pagamentoSelecionado = "PIX";
+let carrinho             = {};
 
 // ================================================================
 //  INICIALIZAÇÃO
 // ================================================================
 (function init() {
-  // Verifica se Firebase está configurado
-  if (firebaseConfig.apiKey === "COLE_SUA_API_KEY") {
-    document.body.innerHTML = `
-      <div style="padding:40px 20px; text-align:center; font-family:system-ui">
-        <div style="font-size:48px; margin-bottom:16px">⚙️</div>
-        <h2 style="margin-bottom:8px">Configure o Firebase</h2>
-        <p style="color:#6b7280; max-width:320px; margin:auto">
-          Edite o arquivo <strong>firebase-config.js</strong> com as
-          credenciais do seu projeto Firebase.
-        </p>
-      </div>`;
-    return;
-  }
-
-  firebase.initializeApp(firebaseConfig);
-
-  // Se o cliente já tinha um pedido ativo, retoma o acompanhamento
   const pedidoSalvo = localStorage.getItem('pedidoAtivo');
   if (pedidoSalvo) {
     try {
       const dados = JSON.parse(pedidoSalvo);
       pedidoAtual = dados;
       mostrarTelaAguardando(dados);
-      iniciarListenerStatus(dados.pedidoId);
+      iniciarPollingStatus(dados.cliente);
       return;
     } catch (_) {
       localStorage.removeItem('pedidoAtivo');
     }
   }
-
   carregarCardapio();
 })();
 
@@ -52,16 +34,15 @@ async function carregarCardapio() {
   const container = document.getElementById('lista-produtos');
   container.innerHTML = `
     <p style="color:var(--muted);text-align:center;padding:50px 20px">
-      <span style="font-size:32px;display:block;margin-bottom:8px">⏳</span>
       Carregando cardápio...
     </p>`;
 
   try {
-    const res = await fetch(SCRIPT_URL + '?produtos=1');
+    const res     = await fetch(SCRIPT_URL + '?produtos=1');
     const produtos = await res.json();
 
     if (!Array.isArray(produtos) || produtos.length === 0) {
-      container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px">Cardápio vazio por enquanto 🙏</p>';
+      container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px">Cardápio vazio por enquanto.</p>';
       return;
     }
 
@@ -116,10 +97,10 @@ function mudarQty(btn, delta) {
 }
 
 function atualizarCartBar() {
-  const itens   = Object.values(carrinho);
+  const itens    = Object.values(carrinho);
   const totalQty = itens.reduce((s, i) => s + i.qty, 0);
   const totalVal = itens.reduce((s, i) => s + i.qty * i.preco, 0);
-  const bar = document.getElementById('cart-bar');
+  const bar      = document.getElementById('cart-bar');
 
   if (totalQty === 0) { bar.classList.add('hidden'); return; }
 
@@ -175,7 +156,7 @@ function selecionarPagamento(el) {
 //  CONFIRMAR PEDIDO
 // ================================================================
 function confirmarPedido() {
-  const nome = document.getElementById('nome-cliente').value.trim();
+  const nome  = document.getElementById('nome-cliente').value.trim();
   const input = document.getElementById('nome-cliente');
 
   if (!nome) {
@@ -185,27 +166,25 @@ function confirmarPedido() {
   }
   input.style.borderColor = '';
 
-  const itens = Object.values(carrinho);
-  const total = getTotal();
+  const itens    = Object.values(carrinho);
+  const total    = getTotal();
   const pedidoId = 'PED-' + Date.now();
 
   pedidoAtual = {
     pedidoId,
-    cliente: nome,
-    itens: itens.map(i => ({ nome: i.nome, qty: i.qty, preco: i.preco })),
-    total: total.toFixed(2),
+    cliente:   nome,
+    itens:     itens.map(i => ({ nome: i.nome, qty: i.qty, preco: i.preco })),
+    total:     total.toFixed(2),
     pagamento: pagamentoSelecionado,
     timestamp: Date.now()
   };
 
   if (pagamentoSelecionado.includes('PIX')) {
-    // Mostra tela PIX antes de enviar
     document.getElementById('pix-display-key').textContent    = PIX_KEY;
     document.getElementById('pix-display-amount').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
     document.getElementById('pix-display-name').textContent   = PIX_NAME;
     mostrarTela('tela-pix');
   } else {
-    // Dinheiro / Cartão: envia direto
     enviarPedido(pedidoAtual);
   }
 }
@@ -221,21 +200,32 @@ function confirmarPagamento() {
 }
 
 // ================================================================
-//  ENVIAR PEDIDO → FIREBASE
+//  ENVIAR PEDIDO → APPS SCRIPT
 // ================================================================
 async function enviarPedido(pedido) {
   try {
-    const db = firebase.database();
-    await db.ref('pedidos/' + pedido.pedidoId).set({
-      ...pedido,
-      status: 'em_preparo'
+    const itensFormatados = pedido.itens.map(i => ({
+      produto:    i.nome,
+      quantidade: String(i.qty),
+      preco:      String(i.preco)
+    }));
+
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        tipo:      'venda',
+        cliente:   pedido.cliente,
+        itens:     JSON.stringify(itensFormatados),
+        total:     pedido.total,
+        pagamento: pedido.pagamento,
+        caixa:     'Lanchonete',
+        data:      new Date().toLocaleString('pt-BR')
+      })
     });
 
-    // Salva localmente para retomar se o cliente fechar a página
     localStorage.setItem('pedidoAtivo', JSON.stringify(pedido));
-
     mostrarTelaAguardando(pedido);
-    iniciarListenerStatus(pedido.pedidoId);
+    iniciarPollingStatus(pedido.cliente);
 
   } catch (e) {
     console.error(e);
@@ -249,7 +239,7 @@ async function enviarPedido(pedido) {
 function mostrarTelaAguardando(pedido) {
   const num = pedido.pedidoId.replace('PED-', '').slice(-4);
 
-  document.getElementById('status-title').textContent = `Olá, ${pedido.cliente}! 👋`;
+  document.getElementById('status-title').textContent = `Olá, ${pedido.cliente}!`;
   document.getElementById('status-num').textContent   = `#${num}`;
 
   document.getElementById('status-itens').innerHTML = pedido.itens.map(i => `
@@ -271,33 +261,40 @@ function mostrarTelaAguardando(pedido) {
 }
 
 // ================================================================
-//  LISTENER EM TEMPO REAL DO STATUS
+//  POLLING DE STATUS (substitui Firebase listener)
+//  Lógica: vê o pedido aparecer como PENDENTE → quando some → PRONTO
 // ================================================================
-function iniciarListenerStatus(pedidoId) {
-  if (statusListener) statusListener.off();
+function iniciarPollingStatus(clienteNome) {
+  sawPending = false;
+  if (pollingTimer) clearInterval(pollingTimer);
 
-  const db  = firebase.database();
-  const ref = db.ref('pedidos/' + pedidoId + '/status');
+  pollingTimer = setInterval(async () => {
+    try {
+      const res      = await fetch(SCRIPT_URL + '?pedidos=1');
+      const pedidos  = await res.json();
+      const encontrado = pedidos.some(p => p.cliente === clienteNome);
 
-  statusListener = ref;
-  ref.on('value', snapshot => {
-    if (snapshot.val() === 'pronto') mostrarPronto();
-  });
+      if (encontrado) {
+        sawPending = true;
+      } else if (sawPending) {
+        clearInterval(pollingTimer);
+        pollingTimer = null;
+        mostrarPronto();
+      }
+    } catch (_) {}
+  }, 5000);
 }
 
 function mostrarPronto() {
   document.getElementById('estado-preparo').classList.add('hidden');
   document.getElementById('estado-pronto').classList.remove('hidden');
 
-  // Vibra no celular (se suportado)
   if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
 
-  // Limpa localStorage
   localStorage.removeItem('pedidoAtivo');
-
-  if (statusListener) {
-    statusListener.off();
-    statusListener = null;
+  if (pollingTimer) {
+    clearInterval(pollingTimer);
+    pollingTimer = null;
   }
 }
 
@@ -305,13 +302,11 @@ function mostrarPronto() {
 //  NOVO PEDIDO
 // ================================================================
 function novoPedido() {
-  carrinho = {};
+  carrinho    = {};
   pedidoAtual = null;
+  sawPending  = false;
   document.getElementById('nome-cliente').value = '';
-
-  // Zera quantidades no cardápio
   document.querySelectorAll('.qty-num').forEach(el => el.textContent = '0');
-
   atualizarCartBar();
   mostrarTela('tela-menu');
 }
