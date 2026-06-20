@@ -54,7 +54,9 @@
 
   <!-- ABA PRODUTO -->
   <div id="produto" class="card" style="display:none">
-    <h2>Cadastrar Produto</h2>
+    <h2 id="tituloProduto">Cadastrar Produto</h2>
+
+    <div id="listaProdutos" style="margin-bottom:16px"></div>
 
     <label>Nome do produto</label>
     <input id="produtoNome" />
@@ -68,7 +70,10 @@
       <option>Lojinha</option>
     </select>
 
-    <button id="btnSalvarProduto" onclick="salvarProduto()">Salvar Produto</button>
+    <div style="display:flex; gap:10px">
+      <button id="btnCancelarEdicao" type="button" onclick="cancelarEdicao()" class="btn-secondary" style="display:none; flex:1">Cancelar</button>
+      <button id="btnSalvarProduto" onclick="salvarProduto()" style="flex:2">Salvar Produto</button>
+    </div>
   </div>
 
   <!-- ABA PEDIDOS -->

@@ -1,6 +1,6 @@
 // cozinha.js – Tela da cozinha (polling Google Apps Script)
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzuldXmAt82bzxv0eaN_VZETg1Py4_Wn00FJEeRW-Cm2F8VYCKLeLMZzLQ-4u39-oW07Q/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-oDWFpUAn8zRLml9fxwgvfY1YWLfjmtWvt3b-YKDnBOL7-7vBw_TDNj9x3lTpwCRcuQ/exec";
 
 let pollingInterval = null;
 

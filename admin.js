@@ -1,14 +1,16 @@
 // admin.js – Painel administrativo (Fluxo de Caixa)
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzuldXmAt82bzxv0eaN_VZETg1Py4_Wn00FJEeRW-Cm2F8VYCKLeLMZzLQ-4u39-oW07Q/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-oDWFpUAn8zRLml9fxwgvfY1YWLfjmtWvt3b-YKDnBOL7-7vBw_TDNj9x3lTpwCRcuQ/exec";
 
 let pagamentoSelecionado = "Dinheiro";
 let produtosCadastrados = [];
+let produtoEditando = null;
 
 // ====== INIT ======
 async function carregarProdutos() {
   const res = await fetch(SCRIPT_URL + '?produtos=1');
   produtosCadastrados = await res.json();
+  renderListaProdutos();
 }
 
 carregarProdutos().then(() => adicionarItem());
@@ -76,6 +78,51 @@ function calcularTotal() {
 }
 
 // ====== PRODUTO ======
+function renderListaProdutos() {
+  const container = document.getElementById('listaProdutos');
+  if (!container) return;
+
+  if (!produtosCadastrados.length) {
+    container.innerHTML = '<p style="color:var(--muted);font-size:14px;margin-bottom:0">Nenhum produto cadastrado ainda.</p>';
+    return;
+  }
+
+  container.innerHTML = `
+    <div style="border-bottom:1.5px solid #f0f0f0; margin-bottom:14px; padding-bottom:4px">
+      ${produtosCadastrados.map((p, i) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f7f7f7">
+          <div>
+            <div style="font-weight:700;font-size:15px">${p.produto}</div>
+            <div style="font-size:13px;color:var(--muted)">R$ ${parseFloat(p.preco).toFixed(2).replace('.', ',')} · ${p.caixa || ''}</div>
+          </div>
+          <button type="button" onclick="editarProduto(${i})" class="btn-secondary" style="width:auto;padding:8px 16px;font-size:13px">Editar</button>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+function editarProduto(idx) {
+  const p = produtosCadastrados[idx];
+  produtoEditando = p;
+  document.getElementById('tituloProduto').textContent = 'Editar Produto';
+  document.getElementById('produtoNome').value = p.produto;
+  document.getElementById('preco').value = p.preco;
+  document.getElementById('caixaProduto').value = p.caixa || 'Lanchonete';
+  document.getElementById('btnSalvarProduto').textContent = 'Atualizar Produto';
+  document.getElementById('btnCancelarEdicao').style.display = '';
+  document.getElementById('produtoNome').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('produtoNome').focus();
+}
+
+function cancelarEdicao() {
+  produtoEditando = null;
+  document.getElementById('tituloProduto').textContent = 'Cadastrar Produto';
+  document.getElementById('produtoNome').value = '';
+  document.getElementById('preco').value = '';
+  document.getElementById('btnSalvarProduto').textContent = 'Salvar Produto';
+  document.getElementById('btnCancelarEdicao').style.display = 'none';
+}
+
 function salvarProduto() {
   const nome  = document.getElementById('produtoNome').value.trim();
   const preco = document.getElementById('preco').value;
@@ -85,19 +132,22 @@ function salvarProduto() {
 
   const btn = document.getElementById('btnSalvarProduto');
   btn.disabled = true;
-  btn.textContent = 'Salvando...';
+  btn.textContent = produtoEditando ? 'Atualizando...' : 'Salvando...';
+
+  const payload = produtoEditando
+    ? { tipo: 'editarProduto', linha: produtoEditando.linha, produto: nome, preco, caixa }
+    : { tipo: 'produto', produto: nome, preco, caixa };
 
   fetch(SCRIPT_URL, {
     method: 'POST',
-    body: JSON.stringify({ tipo: 'produto', produto: nome, preco, caixa })
+    body: JSON.stringify(payload)
   }).then(() => {
-    alert('Produto salvo!');
-    document.getElementById('produtoNome').value = '';
-    document.getElementById('preco').value = '';
+    alert(produtoEditando ? 'Produto atualizado!' : 'Produto salvo!');
+    cancelarEdicao();
     carregarProdutos();
   }).finally(() => {
     btn.disabled = false;
-    btn.textContent = 'Salvar Produto';
+    btn.textContent = produtoEditando ? 'Atualizar Produto' : 'Salvar Produto';
   });
 }
 
