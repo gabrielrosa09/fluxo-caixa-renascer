@@ -90,6 +90,7 @@ input, select {
 }
 
 input:focus, select:focus { border-color: var(--primary); }
+select:invalid, select:has(option[value=""]:checked) { color: var(--muted); }
 
 /* ===== BUTTONS ===== */
 button {

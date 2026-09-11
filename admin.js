@@ -49,7 +49,7 @@ function adicionarItem() {
 
   div.innerHTML = `
     <select class="produto" onchange="atualizarPreco(this)" style="margin-bottom:0">
-      <option value="">Produto</option>
+      <option value="" disabled selected hidden>Produto</option>
       ${options}
     </select>
     <input class="quantidade" type="number" value="1" min="1" style="margin-bottom:0" />
