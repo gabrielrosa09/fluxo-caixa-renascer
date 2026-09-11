@@ -28,19 +28,8 @@
       + Adicionar produto
     </button>
 
-    <div class="row">
-      <div>
-        <label>Caixa</label>
-        <select id="caixaVenda">
-          <option value="">Selecione</option>
-          <option>Lanchonete</option>
-        </select>
-      </div>
-      <div>
-        <label>Total (R$)</label>
-        <input id="total" disabled />
-      </div>
-    </div>
+    <label>Total (R$)</label>
+    <input id="total" disabled />
 
     <label>Pagamento</label>
     <div class="payments">
@@ -63,12 +52,6 @@
 
     <label>Preço (R$)</label>
     <input id="preco" type="number" step="0.01" min="0" />
-
-    <label>Caixa</label>
-    <select id="caixaProduto">
-      <option>Lanchonete</option>
-      <option>Lojinha</option>
-    </select>
 
     <div style="display:flex; gap:10px">
       <button id="btnCancelarEdicao" type="button" onclick="cancelarEdicao()" class="btn-secondary" style="display:none; flex:1">Cancelar</button>

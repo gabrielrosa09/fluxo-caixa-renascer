@@ -5,11 +5,15 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-oDWFpUAn8zRLml9fx
 let pagamentoSelecionado = "Dinheiro";
 let produtosCadastrados = [];
 let produtoEditando = null;
+const CAIXA = 'Lanchonete';
 
 // ====== INIT ======
 async function carregarProdutos() {
   const res = await fetch(SCRIPT_URL + '?produtos=1');
   produtosCadastrados = await res.json();
+  produtosCadastrados.sort((a, b) =>
+    String(a.produto).localeCompare(String(b.produto), 'pt-BR', { sensitivity: 'base' })
+  );
   renderListaProdutos();
 }
 
@@ -93,7 +97,7 @@ function renderListaProdutos() {
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f7f7f7">
           <div>
             <div style="font-weight:700;font-size:15px">${p.produto}</div>
-            <div style="font-size:13px;color:var(--muted)">R$ ${parseFloat(p.preco).toFixed(2).replace('.', ',')} · ${p.caixa || ''}</div>
+            <div style="font-size:13px;color:var(--muted)">R$ ${parseFloat(p.preco).toFixed(2).replace('.', ',')}</div>
           </div>
           <button type="button" onclick="editarProduto(${i})" class="btn-secondary" style="width:auto;padding:8px 16px;font-size:13px">Editar</button>
         </div>
@@ -107,7 +111,6 @@ function editarProduto(idx) {
   document.getElementById('tituloProduto').textContent = 'Editar Produto';
   document.getElementById('produtoNome').value = p.produto;
   document.getElementById('preco').value = p.preco;
-  document.getElementById('caixaProduto').value = p.caixa || 'Lanchonete';
   document.getElementById('btnSalvarProduto').textContent = 'Atualizar Produto';
   document.getElementById('btnCancelarEdicao').style.display = '';
   document.getElementById('produtoNome').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -126,7 +129,7 @@ function cancelarEdicao() {
 function salvarProduto() {
   const nome  = document.getElementById('produtoNome').value.trim();
   const preco = document.getElementById('preco').value;
-  const caixa = document.getElementById('caixaProduto').value;
+  const caixa = CAIXA;
 
   if (!nome || !preco) { alert('Preencha o nome e o preço'); return; }
 
@@ -155,9 +158,9 @@ function salvarProduto() {
 function registrarVenda() {
   const btn    = event.target;
   const cliente = document.getElementById('cliente').value.trim();
-  const caixa   = document.getElementById('caixaVenda').value;
+  const caixa   = CAIXA;
 
-  if (!cliente || !caixa) { alert('Preencha todos os campos'); return; }
+  if (!cliente) { alert('Preencha todos os campos'); return; }
 
   const itens = [];
   let valido = true;
@@ -192,7 +195,6 @@ function registrarVenda() {
   .then(() => {
     alert('Venda registrada!');
     document.getElementById('cliente').value = '';
-    document.getElementById('caixaVenda').value = '';
     document.getElementById('itens').innerHTML = '';
     document.getElementById('total').value = '';
     adicionarItem();
