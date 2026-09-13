@@ -248,6 +248,7 @@ async function carregarDashboard() {
   let totalPendente = 0;
   const contagem = {};
   const pendentes = [];
+  const porPagamento = { Dinheiro: 0, PIX: 0, 'Cartão': 0 };
 
   vendas.forEach(v => {
     const valor  = parseFloat(String(v.total || 0).replace(',', '.')) || 0;
@@ -258,6 +259,9 @@ async function carregarDashboard() {
       totalPendente += valor;
       pendentes.push({ cliente: v.cliente, valor });
     }
+
+    const pag = String(v.pagamento || '').trim();
+    if (pag in porPagamento) porPagamento[pag] += valor;
 
     let itens = [];
     try { itens = JSON.parse(v.itens || '[]'); } catch (_) {}
@@ -270,6 +274,15 @@ async function carregarDashboard() {
 
   document.getElementById('dashTotal').textContent = totalGeral.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   document.getElementById('dashPendente').textContent = totalPendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  // resumo (aparece só no PDF)
+  const brl = n => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  document.getElementById('printVendas').textContent   = vendas.length;
+  document.getElementById('printTicket').textContent   = brl(vendas.length ? totalGeral / vendas.length : 0);
+  document.getElementById('printDinheiro').textContent = brl(porPagamento.Dinheiro);
+  document.getElementById('printPix').textContent      = brl(porPagamento.PIX);
+  document.getElementById('printCartao').textContent   = brl(porPagamento['Cartão']);
+  document.getElementById('printPendCount').textContent = pendentes.length ? `(${pendentes.length})` : '';
 
   const ranking = Object.entries(contagem).sort((a, b) => b[1] - a[1]);
   const maxQty  = ranking[0]?.[1] || 1;
@@ -293,6 +306,14 @@ async function carregarDashboard() {
           <span class="dash-pendente-valor">${p.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
         </div>
       `).join('');
+}
+
+function baixarDashboardPDF() {
+  const agora = new Date();
+  document.getElementById('printData').textContent =
+    agora.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) +
+    ' · ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  window.print();
 }
 
 function finalizarPedido(linha, btn) {
