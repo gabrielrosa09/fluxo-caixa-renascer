@@ -1,6 +1,6 @@
 // cardapio.js – Página do cliente
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-oDWFpUAn8zRLml9fxwgvfY1YWLfjmtWvt3b-YKDnBOL7-7vBw_TDNj9x3lTpwCRcuQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFKhFsDVgIlWzVDqrVrbgI5phzvLgYwZyZXv4OZoeAaBEHK4DX_ADdcb8mLVor-gdTIA/exec";
 
 let pollingTimer         = null;
 let sawPending           = false;
@@ -38,10 +38,14 @@ async function carregarCardapio() {
     </p>`;
 
   try {
-    const res     = await fetch(SCRIPT_URL + '?produtos=1');
-    const produtos = await res.json();
+    const res   = await fetch(SCRIPT_URL + '?produtos=1');
+    const todos = await res.json();
 
-    if (!Array.isArray(produtos) || produtos.length === 0) {
+    // o cardápio mostra só os produtos da Lanchonete (a Livraria tem página própria)
+    const produtos = (Array.isArray(todos) ? todos : [])
+      .filter(p => String(p.caixa || '').trim().toLowerCase() === 'lanchonete');
+
+    if (produtos.length === 0) {
       container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px">Cardápio vazio por enquanto.</p>';
       return;
     }
@@ -191,8 +195,8 @@ function confirmarPedido() {
 
 function copiarPix() {
   navigator.clipboard.writeText(PIX_KEY)
-    .then(() => alert('Chave PIX copiada! ✓'))
-    .catch(() => alert('Chave PIX: ' + PIX_KEY));
+    .then(() => UI.ok('Chave PIX copiada!'))
+    .catch(() => UI.info('Copie a chave PIX: ' + PIX_KEY, { titulo: 'Chave PIX', duracao: 12000 }));
 }
 
 function confirmarPagamento() {
@@ -229,7 +233,7 @@ async function enviarPedido(pedido) {
 
   } catch (e) {
     console.error(e);
-    alert('Erro ao enviar pedido. Verifique sua conexão e tente novamente.');
+    UI.erro('Não conseguimos enviar seu pedido. Verifique a conexão e tente de novo.');
   }
 }
 

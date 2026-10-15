@@ -1,6 +1,6 @@
 // cozinha.js – Tela da cozinha (polling Google Apps Script)
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-oDWFpUAn8zRLml9fxwgvfY1YWLfjmtWvt3b-YKDnBOL7-7vBw_TDNj9x3lTpwCRcuQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFKhFsDVgIlWzVDqrVrbgI5phzvLgYwZyZXv4OZoeAaBEHK4DX_ADdcb8mLVor-gdTIA/exec";
 
 let pollingInterval = null;
 
@@ -112,7 +112,7 @@ async function marcarPronto(linha, btn) {
     await carregarPedidosCozinha();
   } catch (e) {
     console.error(e);
-    alert('Erro ao marcar pedido. Tente novamente.');
+    UI.erro('Não foi possível marcar o pedido. Tente novamente.');
     btn.disabled = false;
     btn.innerHTML = 'PRONTO';
   }

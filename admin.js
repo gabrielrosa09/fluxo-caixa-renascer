@@ -1,6 +1,6 @@
 // admin.js – Painel administrativo (Fluxo de Caixa)
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-oDWFpUAn8zRLml9fxwgvfY1YWLfjmtWvt3b-YKDnBOL7-7vBw_TDNj9x3lTpwCRcuQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFKhFsDVgIlWzVDqrVrbgI5phzvLgYwZyZXv4OZoeAaBEHK4DX_ADdcb8mLVor-gdTIA/exec";
 
 let pagamentoSelecionado = "Dinheiro";
 let produtosCadastrados = [];
@@ -10,7 +10,9 @@ const CAIXA = 'Lanchonete';
 // ====== INIT ======
 async function carregarProdutos() {
   const res = await fetch(SCRIPT_URL + '?produtos=1');
-  produtosCadastrados = await res.json();
+  const todos = await res.json();
+  produtosCadastrados = (Array.isArray(todos) ? todos : [])
+    .filter(p => String(p.caixa || '').trim().toLowerCase() === CAIXA.toLowerCase());
   produtosCadastrados.sort((a, b) =>
     String(a.produto).localeCompare(String(b.produto), 'pt-BR', { sensitivity: 'base' })
   );
@@ -131,7 +133,7 @@ function salvarProduto() {
   const preco = document.getElementById('preco').value;
   const caixa = CAIXA;
 
-  if (!nome || !preco) { alert('Preencha o nome e o preço'); return; }
+  if (!nome || !preco) { UI.aviso('Preencha o nome e o preço'); return; }
 
   const btn = document.getElementById('btnSalvarProduto');
   btn.disabled = true;
@@ -145,7 +147,7 @@ function salvarProduto() {
     method: 'POST',
     body: JSON.stringify(payload)
   }).then(() => {
-    alert(produtoEditando ? 'Produto atualizado!' : 'Produto salvo!');
+    UI.ok(produtoEditando ? 'Produto atualizado!' : 'Produto salvo!');
     cancelarEdicao();
     carregarProdutos();
   }).finally(() => {
@@ -160,7 +162,7 @@ function registrarVenda() {
   const cliente = document.getElementById('cliente').value.trim();
   const caixa   = CAIXA;
 
-  if (!cliente) { alert('Preencha todos os campos'); return; }
+  if (!cliente) { UI.aviso('Preencha o nome da pessoa'); return; }
 
   const itens = [];
   let valido = true;
@@ -175,7 +177,7 @@ function registrarVenda() {
     itens.push({ produto, quantidade, preco });
   });
 
-  if (!valido || itens.length === 0) { alert('Complete todos os produtos'); return; }
+  if (!valido || itens.length === 0) { UI.aviso('Complete todos os produtos da venda'); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Registrando...';
@@ -193,7 +195,7 @@ function registrarVenda() {
     })
   })
   .then(() => {
-    alert('Venda registrada!');
+    UI.ok('Venda registrada!');
     document.getElementById('cliente').value = '';
     document.getElementById('itens').innerHTML = '';
     document.getElementById('total').value = '';
@@ -242,7 +244,11 @@ async function carregarDashboard() {
   document.getElementById('dashPendentes').innerHTML = '<p style="color:var(--muted)">Carregando...</p>';
 
   const res = await fetch(SCRIPT_URL + '?vendas=1');
-  const vendas = await res.json();
+  const todas = await res.json();
+
+  // só as vendas da Lanchonete (também descarta a linha de cabeçalho da planilha)
+  const vendas = (Array.isArray(todas) ? todas : [])
+    .filter(v => String(v.caixa || '').trim().toLowerCase() === CAIXA.toLowerCase());
 
   let totalGeral = 0;
   let totalPendente = 0;
