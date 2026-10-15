@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Figtree:wght@400;500;600;700;800;900&family=Archivo+Black&display=swap');
 
 :root {
   --primary: #2B7A52;
@@ -12,12 +12,26 @@
   --muted: #6B7E72;
   --danger: #E03434;
   --success: #1FA558;
+
+  /* superfícies da marca — o tema Farol troca tudo isto */
+  --header-bg: linear-gradient(160deg, #1B5C3E 0%, #2B7A52 70%, #338A5E 100%);
+  --header-rule: var(--accent);
+  --stat-a-bg: linear-gradient(135deg, #1FA558 0%, #1D5A3A 100%);
+  --stat-a-fg: #fff;
+  --stat-b-bg: linear-gradient(135deg, #E8A825 0%, #c98a1a 100%);
+  --stat-b-fg: #fff;
+  --cta-bg: linear-gradient(135deg, #E9A825 0%, #c98a1a 100%);
+  --cta-fg: #fff;
+  --ok-bg: linear-gradient(135deg, #22c55e, #16a34a);
+  --ok-fg: #fff;
+  --fonte-ui: 'Nunito', system-ui, -apple-system, sans-serif;
+  --fonte-display: 'Nunito', system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  font-family: var(--fonte-ui);
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -25,8 +39,8 @@ body {
 
 /* ===== HEADER ===== */
 header {
-  background: linear-gradient(160deg, #1B5C3E 0%, #2B7A52 70%, #338A5E 100%);
-  border-bottom: 3px solid var(--accent);
+  background: var(--header-bg);
+  border-bottom: 3px solid var(--header-rule);
   padding: 14px 20px;
   display: flex;
   align-items: center;
@@ -82,7 +96,7 @@ input, select {
   border-radius: 12px;
   border: 1.5px solid #e5e7eb;
   font-size: 15px;
-  font-family: 'Nunito', system-ui, sans-serif;
+  font-family: var(--fonte-ui);
   background: #fff;
   outline: none;
   transition: border-color .2s;
@@ -100,7 +114,7 @@ button {
   border: none;
   font-size: 16px;
   font-weight: 800;
-  font-family: 'Nunito', system-ui, sans-serif;
+  font-family: var(--fonte-ui);
   background: var(--primary);
   color: #fff;
   cursor: pointer;
@@ -313,8 +327,8 @@ button:active { transform: scale(0.98); }
   animation: fade .3s ease;
 }
 
-.stat-green { background: linear-gradient(135deg, #1FA558 0%, #1D5A3A 100%); }
-.stat-red   { background: linear-gradient(135deg, #E8A825 0%, #c98a1a 100%); }
+.stat-green { background: var(--stat-a-bg); color: var(--stat-a-fg); }
+.stat-red   { background: var(--stat-b-bg); color: var(--stat-b-fg); }
 
 .stat-label {
   font-size: 11px;
@@ -506,8 +520,8 @@ footer {
   transform: translateX(-50%);
   width: calc(100% - 32px);
   max-width: 568px;
-  background: linear-gradient(135deg, #E9A825 0%, #c98a1a 100%);
-  color: #fff;
+  background: var(--cta-bg);
+  color: var(--cta-fg);
   border-radius: 99px;
   padding: 16px 20px;
   display: flex;
@@ -582,8 +596,8 @@ footer {
 
 /* ===== PRONTO BANNER ===== */
 .pronto-banner {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  color: #fff;
+  background: var(--ok-bg);
+  color: var(--ok-fg);
   border-radius: 20px;
   padding: 32px 24px;
   text-align: center;
@@ -1214,3 +1228,162 @@ footer {
 }
 
 @media print { .toast-caixa { display: none !important; } }
+
+
+/* =====================================================================
+   TEMA FAROL
+   Seminário de Vida no Espírito Santo. As cores saem do cartaz:
+   o amarelo dos feixes, o grafite das listras, o vermelho das faixas
+   do farol e o papel de fundo.
+
+   Fica tudo em :root[data-tema="farol"], então o tema Renascer continua
+   inteiro acima — trocar a constante TEMA em tema.js volta pra ele.
+   ===================================================================== */
+
+:root[data-tema="farol"] {
+  --primary: #15161A;          /* grafite das listras */
+  --primary-dark: #000000;
+  --primary-light: #FFF3C9;
+  --accent: #FFC400;           /* amarelo do feixe */
+  --accent-light: #FFEFB0;
+  --bg: #F2EFE9;               /* papel do cartaz */
+  --card: #ffffff;
+  --text: #15161A;
+  --muted: #6E6A61;
+  --danger: #C9382C;           /* faixas do farol */
+  --success: #2E7D4F;
+
+  --header-bg: #15161A;
+  --header-rule: var(--accent);
+
+  /* arrecadado = a luz; a receber = as faixas do farol */
+  --stat-a-bg: linear-gradient(140deg, #FFC400 0%, #EFA800 100%);
+  --stat-a-fg: #15161A;
+  --stat-b-bg: linear-gradient(140deg, #C9382C 0%, #96251C 100%);
+  --stat-b-fg: #fff;
+
+  --cta-bg: linear-gradient(135deg, #FFC400 0%, #EFA800 100%);
+  --cta-fg: #15161A;
+  --ok-bg: linear-gradient(135deg, #FFC400 0%, #EFA800 100%);
+  --ok-fg: #15161A;
+
+  --fonte-ui: 'Figtree', system-ui, -apple-system, sans-serif;
+  --fonte-display: 'Archivo Black', 'Figtree', system-ui, sans-serif;
+}
+
+/* ---- O feixe: wedges amarelos saindo de trás do logo, como no cartaz.
+       É o único gesto solto do tema; o resto fica quieto. ---- */
+:root[data-tema="farol"] header {
+  overflow: hidden;
+  isolation: isolate;
+}
+:root[data-tema="farol"] header::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 42px;
+  width: 760px;
+  height: 760px;
+  transform: translate(-50%, -50%);
+  background: repeating-conic-gradient(
+    from 4deg,
+    var(--accent) 0deg 6deg,
+    transparent 6deg 45deg
+  );
+  opacity: .55;
+  pointer-events: none;
+  z-index: -1;
+  -webkit-mask-image: radial-gradient(circle at center, #000 0%, rgba(0,0,0,.55) 14%, transparent 34%);
+          mask-image: radial-gradient(circle at center, #000 0%, rgba(0,0,0,.55) 14%, transparent 34%);
+  animation: farol-feixe .85s cubic-bezier(.2, .8, .3, 1) both;
+}
+
+@keyframes farol-feixe {
+  from { opacity: 0;   transform: translate(-50%, -50%) rotate(-14deg); }
+  to   { opacity: .55; transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+/* o nome em branco com o amarelo deslocado atrás, como as letras do cartaz */
+:root[data-tema="farol"] header h1 {
+  font-family: var(--fonte-display);
+  font-size: 17px;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 var(--accent);
+}
+:root[data-tema="farol"] header p {
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+/* números do dashboard na fonte de cartaz */
+:root[data-tema="farol"] .stat-value,
+:root[data-tema="farol"] .acervo-stat-valor,
+:root[data-tema="farol"] .pix-amount,
+:root[data-tema="farol"] .order-num {
+  font-family: var(--fonte-display);
+  letter-spacing: -.2px;
+}
+
+:root[data-tema="farol"] .pronto-banner h2,
+:root[data-tema="farol"] .status-title {
+  font-family: var(--fonte-display);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+/* "Já paguei" e "Pedido pronto" acendem em amarelo, não em verde */
+:root[data-tema="farol"] .btn-success {
+  background: var(--accent) !important;
+  color: var(--text) !important;
+}
+:root[data-tema="farol"] .btn-success:hover { background: #EFA800 !important; }
+:root[data-tema="farol"] .pronto-banner p { color: rgba(21, 22, 26, .72); }
+:root[data-tema="farol"] .pronto-banner .big-emoji svg { stroke: var(--text); }
+
+/* Figtree é mais estreita que a Nunito: devolve um pouco de peso aos rótulos */
+:root[data-tema="farol"] label,
+:root[data-tema="farol"] .stat-label,
+:root[data-tema="farol"] .acervo-stat-label {
+  letter-spacing: .6px;
+}
+
+/* preço alinhado coluna com coluna, em qualquer tema */
+.stat-value,
+.acervo-stat-valor,
+.preco-item,
+#total,
+.dash-pendente-valor,
+.produto-preco,
+.order-total,
+.cart-bar-total,
+.pix-amount {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-tema="farol"] header::before { animation: none; opacity: .55; }
+}
+
+@media print {
+  :root[data-tema="farol"] header::before { display: none !important; }
+}
+
+/* No Farol os dois tons claros são amarelo, então o badge de estoque normal
+   precisa ser neutro: assim "normal / acabando / zerado" continuam distintos. */
+:root[data-tema="farol"] .estoque-badge {
+  background: #EDEAE4;
+  color: #4A463F;
+}
+:root[data-tema="farol"] .estoque-badge.estoque-baixo {
+  background: var(--accent);
+  color: #15161A;
+}
+:root[data-tema="farol"] .estoque-badge.estoque-zero {
+  background: #FBE3E0;
+  color: var(--danger);
+}
+:root[data-tema="farol"] .estoque-badge.estoque-na {
+  background: #F3F1EC;
+  color: var(--muted);
+}

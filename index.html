@@ -2,17 +2,18 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin – Renascer</title>
+  <title>Admin – Farol</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="tema.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <header>
-  <img src="logo-renascer.svg" alt="Renascer" />
+  <img data-marca="logo" src="logo-farol.svg" alt="Farol" />
   <div>
     <h1>Fluxo de Caixa</h1>
-    <p>Lanchonete · Renascer</p>
+    <p>Lanchonete · <span data-marca="nome">Farol</span></p>
   </div>
   <a href="livraria.html" class="header-link no-print" title="Ir para a Livraria">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>
@@ -74,7 +75,7 @@
   <!-- ABA DASHBOARD -->
   <div id="dashboard" style="display:none">
     <div class="print-header">
-      <img src="logo-renascer.svg" alt="Renascer" />
+      <img data-marca="logo" src="logo-farol.svg" alt="Farol" />
       <div>
         <div class="print-title">Relatório de Vendas</div>
         <div class="print-sub">Fluxo de Caixa · Lanchonete</div>
@@ -118,11 +119,11 @@
       </div>
     </div>
 
-    <div class="print-footer">Sistema de Caixa – Renascer</div>
+    <div class="print-footer" data-marca="rodape">Sistema de Caixa – Farol</div>
   </div>
 </main>
 
-<footer>Sistema de Caixa – Renascer</footer>
+<footer data-marca="rodape">Sistema de Caixa – Farol</footer>
 
 <nav class="bottom-nav">
   <div class="tab active" onclick="mostrar('venda', this)">

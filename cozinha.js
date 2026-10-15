@@ -125,7 +125,7 @@ function atualizarBadge(count) {
   const badge = document.getElementById('badge-total');
   badge.classList.toggle('hidden', count === 0);
   badge.textContent = count;
-  document.title = count > 0 ? `(${count}) Cozinha – Renascer` : 'Cozinha – Renascer';
+  document.title = count > 0 ? `(${count}) Cozinha – ${MARCA.nome}` : `Cozinha – ${MARCA.nome}`;
 }
 
 function estadoVazio() {
